@@ -1,0 +1,175 @@
+PUNTAJE: 
+
+0: No realizado.
+0.25: Implementación con problemas mayores (funciona 25% de las veces o no funciona)
+0.5: Implementación con funcionamiento irregular (funciona 50% de las veces)
+0.75: Implementación con problemas menores (funciona 75% de las veces)
+1: Implementación completa sin problemas (funciona 100% de las veces)
+
+Requerimientos Funcionales Obligatorios.
+(0.5 pts). Implementar abstracciones apropiadas para el problema. Para la implementación debe regirse por estructura de implementación de
+TDA vista en clases: Representación, Constructores,Predicados de Pertenencia, Selectores, Modificadores y otros predicados que operen
+sobre la representación. Solo aquello que utilice. Procurar hacer un uso adecuado de esta estructura a fin de no afectar la eficiencia de
+sus predicados principales. En el resto de los predicados debe efectivamente hacer un uso adecuado de la implementación del TDA. Solo
+implementar los predicados necesarios dentro de esta estructura. Dejar claramente documentado con comentarios en el código que
+corresponde a la estructura base del TDA. La estructura del TDA debe considerar al menos el nombre del repositorio git, su fecha/hora de
+creación y las 4 zonas de trabajo (workspace, index, localRepository y remoteRepository).
+
+Requisito base: Especificar representación de manera clara para cada TDA implementado (en el informe y en el código a través de
+comentarios). Luego implementar constructores, funciones de pertenencia, y según se requiera selectores, modificadores y otras funciones
+que pueda requerir para las otras funciones requeridas a continuación.
+
+(0.5 pto) gitInit: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un nombre y autor. RepoOutput tendría
+un repositorio vacío sin commits y sin archivos en sus zonas.
+
+		gitInit(NombreRepo, Autor, RepoOutput).
+		Ejemplo de uso: gitInit(“lab3”, “Constanza Zarate”, RepoOutput).
+
+(1 pto) gitAdd: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
+que en RepoOutput se mueven los archivos desde la zona Workspace a la zona Index. Puede hacerlo con la especificación de una lista de
+nombres de archivos concretos (nombres como strings).
+
+RepoInput corresponde al repositorio de entrada a este predicado con las cuatro zonas de acuerdo a la representación escogida para este 
+
+TDA. En la variable RepoOutput debe retornar el resultado, esto aplica para todos los siguientes predicados que usen estas variables.
+
+		gitAdd(RepoInput, Archivos, RepoOutput).
+		ejemplos de uso: gitAdd(RepoInput, [ “file1.txt”, “f2.pl”, “archivo3.docx” ], RepoOutput).
+    	     	gitadd(RepoInput, [ ], RepoOutput).
+    	     	
+(1 pto) gitCommit: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
+que en RepoOutput  hay un commit con los cambios almacenados en index y especificando un mensaje descriptivo (un string) para llevarlos
+al LocalRepository.
+
+		gitCommit(RepoInput, Mensaje, RepoOutput).
+		ejemplo de uso: gitCommit(RepoInput, “miCommit”), RepoOutput).
+
+(0.5 pts) gitPush: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
+que en RepoOutput se envían los commit desde el repositorio local al repositorio remoto registrado en las zonas de trabajo.
+
+	gitPush(RepoInput, RepoOutput).
+
+(1 pto) git2String: Predicado que permite consultar el valor que debe tomar un String con una representación como un string posible de
+visualizar de forma comprensible al usuario a partir de una variable de entrada RepoInput. Debe hacer uso del caracter ‘\n’ para los
+saltos de línea. No utilice los predicados write y display dentro de este predicado, ya que en la variable de salida RepoAsString debe
+quedar un string el cual pueda luego ser pasado como entrada a los predicados “write” o “display” para poder visualizarlo de forma
+comprensible al usuario.
+Requisito base: el string resultante al ser impreso por los predicados write o display debe ilustrar con claridad los elementos de cada
+zona de trabajo (i.e., workspace, index, localRepository y remoteRepository).
+
+	git2String(RepoInput, RepoAsString).
+	Ejemplo de lo que debería resultar al pasar la variable de salida RepoAsString como entrada al predicado write:
+	
+###### Repositorio 'lab3' ######
+	Fecha de creación: 2020/05/20 15:40:10
+	Autor: Juanito Perez
+	rama actual: master
+	Archivos en workspace:
+    	a1.txt
+	asd.dat
+	blablabla.jpg
+	Archivos en Index:
+	Commits en local repository:
+	[12AB1EFF] 'mensaje de ejemplo del primer commit'
+	a1.txt
+	[AAA8B1CCF] 'otro mensaje para segundo commit, se agrega archivo asd.dat y blablabla.jpg'
+	asd.dat
+	blablabla.jpg
+	Commits en remote repository:
+	[12AB1EFF] 'mensaje de ejemplo del primer commit'
+	a1.txt
+##### FIN DE REPRESENTACIÓN COMO STRING DEL REPOSITORIO #####
+
+Requerimientos extra (se consideran si y sólo si la evaluación de los requerimientos obligatorios es igual o superior a 4.0. La nota máxima que se puede alcanzar es un 7.0 en RF).
+
+
+(1 pto) gitPull: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
+que en RepoOutput se mueven los cambios (commits) desde RemoteRepository hacia el LocalRepository y deja en el workspace los nuevos
+archivos contenidos en estos commits.
+
+	gitPull(RepoInput, RepoOutput).
+	
+(1 pto) gitStatus: Predicado que permite consultar el valor que debe tomar un String partir de una variable de entrada RepoInput, tal que
+este string contiene la información del ambiente de trabajo de forma legible:
+
+Archivos agregados al Index
+Cantidad de commits en el Local Repository
+La rama actual en la que se encuentra el Local Repository (predeterminado: “master”)
+
+Debe hacer uso del caracter ‘\n’ para los saltos de línea. No utilice los predicados write y display dentro de este predicado, ya que en
+la variable de salida RepoStatusStr debe quedar un string el cual pueda luego ser pasado como entrada a los predicados “write” o
+“display” para poder visualizarlo de forma comprensible al usuario.
+
+	gitStatus(RepoInput, RepoStatusStr).
+
+Ejemplo de uso: gitStatus(RepoInput, RS), write(RS).
+
+(1 pto) gitLog: Predicado que permite consultar el valor que debe tomar un String partir de una variable de entrada RepoInput, tal que
+este string represente de forma legible al usuario la información de los últimos 5 commits sobre el repositorio/rama actual, se debe
+mostrar al menos el mensaje asociado a cada commit.
+
+Debe hacer uso del caracter ‘\n’ para los saltos de línea. No utilice los predicados write y display dentro de este predicado, ya que en
+la variable de salida RepoLogStr debe quedar un string el cual pueda luego ser pasado como entrada a los predicados “write” o “display”
+para poder visualizarlo de forma comprensible al usuario.
+
+	gitLog(RepoInput, RepoLogStr).
+	
+Ejemplo de uso: gitLog(RepoInput, RS), write(RS).
+
+(1 pto) gitBranch: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
+que en RepoOutput se contenga una nueva “rama” (flujo alternativo de los commits). De manera predeterminada, la nueva rama toma la
+historia del último commit. Las ramas deben tener un nombre, donde la rama predeterminada se llama “master”.
+
+	gitBranch(RepoInput, NombreRama, RepoOutput).
+	Ejemplo de uso: gitBranch(RepoInput, “develop”, RepoOutput).
+	
+(0,5 pts) gitCheckout: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput
+tal que en RepoOutput la rama actual corresponde a la especificada por la variable NombreRama.
+
+	gitBranch(RepoInput, NombreRama, RepoOutput).
+
+Ejemplo de uso: gitBranch(RepoInput, “develop”, RepoOutput).
+
+A continuación se muestra un ejemplo completo de uso pasando por la gran mayoría de predicados de este laboratorio:
+
+gitInit("lab3", "Juanito Perez", R1), 
+gitAdd(R1, [ "a1.txt" ], R2), 
+gitCommit(R2, "mensaje de ejemplo del primer commit", R3), 
+gitPush(R3, R4),
+git2String(R1, R1Str), write(R1Str),
+git2String(R2, R2Str), write(R2Str),
+git2String(R3, R3Str), write(R3Str),
+git2String(R4, R4Str), write(R4Str),
+gitLog(R2, RlogStr), write(RlogStr),
+gitAdd(R4, [ "asd.dat", "blablabla.jpg" ], R5),
+git2String(R5, R5Str), write(R5Str).
+
+Notar como el repositorio de salida de cada predicado se puede pasar como variable de entrada al predicado siguiente.
+
+
+
+Requerimientos No Funcionales obligatorios. Nota que algunos son ineludibles, esto quiere decir que al no cumplir con dicho
+requerimiento, su proyecto será evaluado con la nota mínima.
+
+(obligatorio) Incluir autoevaluación de cada uno de los requerimientos funcionales (obligatorios y extras) solicitados.
+
+(obligatorio) La implementación debe ser en el lenguaje de programación Prolog.
+
+(obligatorio) Usar Swi-Prolog versión 8.x.x.
+
+(1.5 pts) Todos los predicados deben estar debidamente comentados. Indicando descripción de la relación, términos de entrada y de salida.
+
+(2.5 pts) Historial de trabajo en Github tomando en consideración la evolución en el desarrollo de su proyecto en distintas etapas. Se
+requieren al menos 10 commits distribuidos en un periodo de tiempo mayor o igual a 2 semanas. Los criterios que se consideran en la
+evaluación de este ítem son: fecha primer commit, fecha último commit, total commits y máximo de commits diarios. A modo de ejemplo (y
+solo como una referencia), si hace todos los commits el día antes de la entrega del proyecto, este ítem tendrá 0 pts. De manera similar,
+si hace dos commits dos semanas antes de la entrega final y el resto los concentra en los últimos dos días, tendrá una evaluación del 25%
+para este ítem (0.375 pts). Por el contrario, si demuestra constancia en los commits (con aportes claros entre uno y otro) a lo largo del
+periodo evaluado, este ítem será evaluado con el total del puntaje.
+
+(obligatorio) Al final de su código incluir al menos 3 ejemplos de uso para cada  uno de los predicados correspondientes a requerimientos
+funcionales obligatorios y extra que realice. Solo se revisarán aquellos predicados para los que existan los ejemplos provistos.
+
+
+
+
