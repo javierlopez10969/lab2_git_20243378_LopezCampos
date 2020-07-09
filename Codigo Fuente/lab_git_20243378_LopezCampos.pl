@@ -47,7 +47,6 @@
 %Ejemplo de uso :  gitAdd(RepoInput, [ “file1.txt”, “f2.pl”, “archivo3.docx” ], RepoOutput).
 %  				   gitadd(RepoInput, [ ], RepoOutput).
 
-
 %----------------------------------------------------------------------------------------------------------------------------------------------
 
 
