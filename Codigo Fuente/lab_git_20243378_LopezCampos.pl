@@ -55,9 +55,17 @@ getTime(Tiempo):-
 %Predicados de Pertenencia
 %Verifica el tipo de lista con los nombres de archivos
 
-
 %Predicado que verifica la aridad correcta del repositorio, y compruebe que no este vacío el workspace
-verificarInputAdd(Lista):- is_list(Lista), length(Lista, L) , L = 8,not(nth0(4,Lista,[])).
+verificarInputAdd(Lista):- is_list(Lista), longitud(Lista, L) , L = 8,not(nth0(4,Lista,[])),true.
+%False cases
+%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], [],[]],verificarInputAdd(R1).
+%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], [],[],[]],verificarInputAdd(R1).
+%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], []],verificarInputAdd(R1).
+%True Case
+%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [],[]],verificarInputAdd(R1).
+%verificarInputAdd(["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [],[]]).
+
+
 
 %Predicado que verifica si corresponde a una lista de strings
 es_Lista_String([]).
@@ -65,33 +73,19 @@ es_Lista_String([X|Y]):- string(X), es_Lista_String(Y).
 
 %Predicado que verifica si es una lista tiene todos sus elementos en otra lista
 %X elemento que se quiere verificar si se encuentra en la lista [A|B]
-elemento_is_inside([],[_|_]).
-elemento_is_inside([X|Y],[A|B]):-member(X,[A|B]),elemento_is_inside(Y,[A|B]).
+elemento_is_inside([],[_|_]):-!.
+elemento_is_inside([X|Y],[A|B]):-member(X,[A|B]),elemento_is_inside(Y,[A|B]),!.
+/*
+R1 = ["Samuel.txt","Jackson.pdf"] , Arch = ["Samuel.txt","Jackson.pdf"],elemento_is_inside(Arch,R1).
+elemento_is_inside(["Samuel.txt","Jackson.pdf"],["Samuel.txt","Jackson.pdf"] ).
+elemento_is_inside(["Samuel.txt"],["Samuel.txt","Jackson.pdf"] ).
+elemento_is_inside(["Samuel.txt","Jackson.pdf","KK.krit"],["Samuel.txt","Jackson.pdf"] ).
+*/
 %Selectores
+
 %Modificadores 
+% Operadores de listas 
 
-
-
-%Predicados por implementar ---------------------------------------------------------------------------------------------
-%----------------------------------------------------------------------------------------------------------------------------------------------
-
-%gitinit
-%Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un nombre y autor. 
-%RepoOutput tendría un repositorio vacío sin commits y sin archivos en sus zonas.
-%ENTRADAS : gitInit(NombreRepo, Autor, RepoOutput).
-
-%Ejemplo de uso :  gitInit(“lab3”, “Constanza Zarate”, RepoOutput).
-%Al ser init, es decir el incio de creación no se requiere las ramas
-gitInit(NombreRepo, Autor, RepoOutput):-string(NombreRepo),string(Autor),getTime(T),
-										RepoOutput = [NombreRepo,T,Autor,"master",[],[],[],[]].
-%Ejemplo de uso:
-%gitInit("Mylab","Juanjo",R).
-
-%----------------------------------------------------------------------------------------------------------------------------------------------
-
-%gitAdd: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal que en RepoOutput se mueven los archivos 
-%desde la zona Workspace a la zona Index. Puede hacerlo con la especificación de una lista de nombres de archivos concretos (nombres como strings).
-%Los archivos vienen en una lista de string
 %Borrar
 borrar(X,[X|Y],Y).
 borrar(X,[Z|L],[Z|M]):-borrar(X,L,M).
@@ -122,28 +116,53 @@ R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Ja
 intercambiarN(0,Arch,R1,RepoOutput).
 */
 
+%Implementaciones
 
-%Para apendear hay que reconstruir toda la lista?
-%Preguntamos si acaso la lista de archivos tienen la misma cantidad que los archivos del workspace
-recorrerArchivos(Archivos,Workspace,RepoInput,RepoOutput):-
-														same_length(Workspace,Archivos),
-														elemento_is_inside(Archivos,Workspace),%Me aseguro que
-														intercambiarN(5,Archivos,RepoInput,RepoOutput).
-%Caso de que sea menor la longitud de archivos y workspace
-recorrerArchivos(Archivos,Workspace,RepoInput,RepoOutput):-
-														length(Archivos) < length(Workspace),
-														elemento_is_inside(Archivos,Workspace),
-														intercambiarN(5,Archivos,RepoInput,RepoOutput).
+%Calculador de longitud de cualquier lista
+longitud([],0).
+longitud([_|Y],N):-longitud(Y,M),N is M+1.
+%X =["Samuel.txt","Jackson.pdf"],longitud(X,N).
+
+%Predicados principales por implementar ---------------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------------------------------------------------------------
+
+%gitinit
+%Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un nombre y autor. 
+%RepoOutput tendría un repositorio vacío sin commits y sin archivos en sus zonas.
+%ENTRADAS : gitInit(NombreRepo, Autor, RepoOutput).
+
+%Ejemplo de uso :  gitInit(“lab3”, “Constanza Zarate”, RepoOutput).
+%Al ser init, es decir el incio de creación no se requiere las ramas
+gitInit(NombreRepo, Autor, RepoOutput):-string(NombreRepo),string(Autor),getTime(T),
+										RepoOutput = [NombreRepo,T,Autor,"master",[],[],[],[]].
+%Ejemplo de uso:
+%gitInit("Mylab","Juanjo",R).
+
+%----------------------------------------------------------------------------------------------------------------------------------------------
+
+%gitAdd: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal que en RepoOutput se mueven los archivos 
+%desde la zona Workspace a la zona Index. Puede hacerlo con la especificación de una lista de nombres de archivos concretos (nombres como strings).
+%Los archivos vienen en una lista de string
+
+
+
+
 %2 casos
 %la lista de archivos se encuentra vacía, hacemos un corte, ya que no queremos más opciones
-gitAdd(RepoInput,[],RepoOutput):-verificarInputAdd(RepoInput),RepoOutput = RepoInput,!.
+gitAdd(RepoInput,[],RepoOutput):-
+								verificarInputAdd(RepoInput),
+								nth0(4,RepoInput,Workspace),%Obtenemos el Workspace
+								intercambiarN(5,Workspace,RepoInput,RepoOutput),!.
 %Caso de que no se encuentre vacía
 gitAdd(RepoInput, Archivos, RepoOutput):-
 										is_list(Archivos),es_Lista_String(Archivos), %Verificación de la lista de archivos
 										verificarInputAdd(RepoInput),%Verificamos la aridad y el workspace del RepInput
-									  	nth0(5,RepoInput,Workspace),%Obtenemos el Workspace
+									  	nth0(4,RepoInput,Workspace),%Obtenemos el Workspace
 									  	is_list(Workspace),%Nos aseguramos que sea una lista
-										recorrerArchivos(Archivos,Workspace,RepoInput,RepoOutput).
+										longitud(Archivos,NA) , longitud(Workspace,N),
+										NA =< N,
+										elemento_is_inside(Archivos,Workspace),%Me aseguro que los nombres dados se encuentran dento del workspace
+										intercambiarN(5,Archivos,RepoInput,RepoOutput),!.
 
 %RepoInput corresponde al repositorio de entrada a este predicado con las cuatro zonas de acuerdo a la representación escogida para este TDA. En la variable RepoOutput 
 %debe retornar el resultado, esto aplica para todos los siguientes predicados que usen estas variables.
@@ -156,11 +175,16 @@ gitAdd(RepoInput, Archivos, RepoOutput):-
 %Porque el workspace se encuentra vacío
 %gitInit("Mylab","Juanjo",Ri),Arch = ["texo.txt","imagen.jpg"],gitAdd(Ri,Arch,Ro).
 %gitInit("Mylab","Juanjo",R),gitAdd(R,[],Routput).
-%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], []] , Arch = [] ,  gitAdd(R1,Arch,RepoOutput).
+%Porque el archivo dado es incorrecto
+%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], []] , Arch = ["Jack.pdf"] ,  gitAdd(R1,Arch,RepoOutput).
+
 
 %Casos que devuelven un valor
+%Git add all
+%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], []], gitAdd(R1,[],RepoOutput).
+%Git add con distintas cantidades de archivos
+%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], []] , Arch = ["Jackson.pdf"] ,  gitAdd(R1,Arch,RepoOutput).
 %R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], []] , Arch = ["Samuel.txt","Jackson.pdf"] ,  gitAdd(R1,Arch,RepoOutput).
-
 %----------------------------------------------------------------------------------------------------------------------------------------------
 
 
