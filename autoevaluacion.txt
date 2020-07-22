@@ -14,6 +14,7 @@ sus predicados principales. En el resto de los predicados debe efectivamente hac
 implementar los predicados necesarios dentro de esta estructura. Dejar claramente documentado con comentarios en el código que
 corresponde a la estructura base del TDA. La estructura del TDA debe considerar al menos el nombre del repositorio git, su fecha/hora de
 creación y las 4 zonas de trabajo (workspace, index, localRepository y remoteRepository).
+PUNTAJE : 1
 
 Requisito base: Especificar representación de manera clara para cada TDA implementado (en el informe y en el código a través de
 comentarios). Luego implementar constructores, funciones de pertenencia, y según se requiera selectores, modificadores y otras funciones
@@ -24,6 +25,8 @@ un repositorio vacío sin commits y sin archivos en sus zonas.
 
 		gitInit(NombreRepo, Autor, RepoOutput).
 		Ejemplo de uso: gitInit(“lab3”, “Constanza Zarate”, RepoOutput).
+
+PUNTAJE : 1
 
 (1 pto) gitAdd: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
 que en RepoOutput se mueven los archivos desde la zona Workspace a la zona Index. Puede hacerlo con la especificación de una lista de
@@ -36,6 +39,8 @@ TDA. En la variable RepoOutput debe retornar el resultado, esto aplica para todo
 		gitAdd(RepoInput, Archivos, RepoOutput).
 		ejemplos de uso: gitAdd(RepoInput, [ “file1.txt”, “f2.pl”, “archivo3.docx” ], RepoOutput).
     	     	gitadd(RepoInput, [ ], RepoOutput).
+
+PUNTAJE : 1
     	     	
 (1 pto) gitCommit: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
 que en RepoOutput  hay un commit con los cambios almacenados en index y especificando un mensaje descriptivo (un string) para llevarlos
@@ -44,6 +49,7 @@ al LocalRepository.
 		gitCommit(RepoInput, Mensaje, RepoOutput).
 		ejemplo de uso: gitCommit(RepoInput, “miCommit”), RepoOutput).
 
+PUNTAJE : 1
 (0.5 pts) gitPush: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
 que en RepoOutput se envían los commit desde el repositorio local al repositorio remoto registrado en las zonas de trabajo.
 
