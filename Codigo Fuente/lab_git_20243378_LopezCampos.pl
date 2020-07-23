@@ -69,6 +69,7 @@ crear_archivos(RepoInput,[X|Y],RepoOutput):-
 
 %Creador de commit
 crear_Commit([X|Y],Mensaje,Commit):-Commit = [Mensaje,[X|Y]|[]].
+%crear_Commit([X|Y],Mensaje,Commit):-Commit = string_concat(Mensaje,"\n",S),[S,[X|Y]|[]].
 
 %Predicados de Pertenencia
 
@@ -295,7 +296,8 @@ recorrerLocal([X|Y],RemoteRepository,RepoInput,RepoOutput):-
 
 recorrerLocal([X|Y],RemoteRepository,RepoInput,RepoOutput):-
 										member(X,RemoteRepository),%preguntamos si el elemento se encuentra dentro de Remote repository
-										recorrerLocal(Y,RemoteRepository,RepoInput,RepoOutput).			
+										recorrerLocal(Y,RemoteRepository,RepoInput,RepoOutput).
+
 %gitPush: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal que en RepoOutput se envían 
 %los commit desde el repositorio local al repositorio remoto registrado en las zonas de trabajo.
 gitPush(RepoInput, RepoOutput):-
@@ -305,15 +307,234 @@ gitPush(RepoInput, RepoOutput):-
 								%write(RemoteRepository),	
 								recorrerLocal(LocalRepository,RemoteRepository,RepoInput,RepoOutput),!.
 
-%gitInit("Unity Project","Playdead",R0),crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),gitAdd(R1,[],R2),gitCommit(R2,"Character controllers",R3),gitPush(R3,Rout).
+/*
+Ejemplo de uso
+gitInit("Unity Project","Playdead",R0),
+crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
+gitAdd(R1,[],R2),
+gitCommit(R2,"Character controllers",R3),
+gitPush(R3,Rout).
+*/
 %----------------------------------------------------------------------------------------------------------------------------------------------
+%gitPull: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
+%que en RepoOutput se mueven los cambios (commits) desde RemoteRepository hacia el LocalRepository y deja en el workspace los nuevos
+%archivos contenidos en estos commits.
+
+%gitPull(RepoInput, RepoOutput).
+
+
+%----------------------------------------------------------------------------------------------------------------------------------------------	
+
+%git2String: Predicado que permite consultar el valor que debe tomar un String con una representación como un string posible de
+%visualizar de forma comprensible al usuario a partir de una variable de entrada RepoInput. Debe hacer uso del caracter ‘\n’ para los
+%saltos de línea. No utilice los predicados write y display dentro de este predicado, ya que en la variable de salida RepoAsString debe
+%quedar un string el cual pueda luego ser pasado como entrada a los predicados “write” o “display” para poder visualizarlo de forma
+%comprensible al usuario.
+%Requisito base: el string resultante al ser impreso por los predicados write o display debe ilustrar con claridad los elementos de cada
+%zona de trabajo (i.e., workspace, index, localRepository y remoteRepository).
+
+%Predicado que permite concatenar una lista de elementos a un string ya existente
+
+%Caso borde, lista de elementos vacía
+workspace2String([],StringEntrada,String):-string_concat(StringEntrada,"Workspace Vacío\n",String),!.
+%Caso borde, siguiente elemento vacío
+workspace2String([X|[]],StringEntrada,String):-string_concat(StringEntrada,X,S),string_concat(S,"\n",String),!.
+%Llamada recursiva, cuando si existe un siguiente elemnto en la lista
+workspace2String([X|Y],StringEntrada,String):-string_concat(StringEntrada,X,S),string_concat(S,"\n",NewString),workspace2String(Y,NewString,String).
+
+%Predicado que hace lo mismo que workspace2String, solo que en un caso borde necesita decir Index Vacío
+
+%Caso borde, lista de elementos vacía
+index2String([],StringEntrada,String):-string_concat(StringEntrada,"Index Vacío\n",String),!.
+%Caso borde, siguiente elemento vacío
+index2String([X|[]],StringEntrada,String):-string_concat(StringEntrada,X,S),string_concat(S,"\n",String),!.
+%Llamada recursiva, cuando si existe un siguiente elemnto en la lista
+index2String([X|Y],StringEntrada,String):-string_concat(StringEntrada,X,S),string_concat(S,"\n",NewString),index2String(Y,NewString,String).
+
+%Predicado que transforma local repository a un string
+
+%Caso borde, lista de elementos vacía
+local2String([],StringEntrada,String):-string_concat(StringEntrada,"Local Repository Vacío\n",String),!.
+local2String([X|[]],StringEntrada,String):-
+										is_list(X), %preguntamos si X es una lista
+										nth0(0,X,Comentario),string(Comentario), %Preguntamos si el primer elemento corresponde a un string.
+										string_concat(StringEntrada,"      '",S),
+										string_concat(S,Comentario,S0),%Concatenamos el comentario
+										string_concat(S0,"'\n",S1),
+										nth0(1,X,Workspace),is_list(Workspace),
+										workspace2String(Workspace,S1,String),
+										!.
+local2String([X|Y],StringEntrada,String):-
+										is_list(X), %preguntamos si X es una lista
+										nth0(0,X,Comentario),string(Comentario), %Preguntamos si el primer elemento corresponde a un string.
+										string_concat(StringEntrada,"      '",S),
+										string_concat(S,Comentario,S0),%Concatenamos el comentario
+										string_concat(S0,"'\n",S1),
+										nth0(1,X,Workspace),is_list(Workspace),
+										workspace2String(Workspace,S1,S2),
+										local2String(Y,S2,String)%Llamada recursiva
+										.
+%Predicado que transforma remote repository a un string, funciona igual que local, solo que con  un mensaje distitno en caso de estar vacío
+
+remote2String([],StringEntrada,String):-string_concat(StringEntrada,"Remote Repository Vacío\n",String),!.
+remote2String([X|[]],StringEntrada,String):-
+										is_list(X), %preguntamos si X es una lista
+										nth0(0,X,Comentario),string(Comentario), %Preguntamos si el primer elemento corresponde a un string.
+										string_concat(StringEntrada,"      '",S),
+										string_concat(S,Comentario,S0),%Concatenamos el comentario
+										string_concat(S0,"'\n",S1),
+										nth0(1,X,Workspace),is_list(Workspace),
+										workspace2String(Workspace,S1,String),
+										!.
+remote2String([X|Y],StringEntrada,String):-
+										is_list(X), %preguntamos si X es una lista
+										nth0(0,X,Comentario),string(Comentario), %Preguntamos si el primer elemento corresponde a un string.
+										string_concat(StringEntrada,"      '",S),
+										string_concat(S,Comentario,S0),%Concatenamos el comentario
+										string_concat(S0,"'\n",S1),
+										nth0(1,X,Workspace),is_list(Workspace),
+										workspace2String(Workspace,S1,S2),
+										remote2String(Y,S2,String)%Llamada recursiva
+										.
+git2String(RepoInput, RepoAsString):-
+									is_list(RepoInput), longitud(RepoInput, L) , L = 8,
+									%Nombre del repositorio
+									nth0(0,RepoInput,NombreRepo),string(NombreRepo), string_concat( "\n\n\n###### Repositorio : '",NombreRepo,S0),
+									%Fecha del Repositorio
+									nth0(1,RepoInput,Fecha),string(Fecha),string_concat(S0,"' ######\nFecha de creación : ",S1),string_concat(S1,Fecha,S2),
+									%Autor del Repositorio
+									nth0(2,RepoInput,Autor),string(Autor),string_concat(S2,"\n\nAutor: ",S3),string_concat(S3,Autor,S4),
+									%Rama del repositorio
+									nth0(3,RepoInput,Branch),string(Branch),string_concat(S4,"\nrama actual: ",S5),string_concat(S5,Branch,S6),
+									%Workspace
+									nth0(4,RepoInput,Workspace),is_list(Workspace),string_concat(S6,"\n\nArchivos en workspace:\n",S7),
+									workspace2String(Workspace,S7,S8),
+									%Index	
+									nth0(5,RepoInput,Index),is_list(Index),string_concat(S8,"\nArchivos en Index:\n ",S9),
+									index2String(Index,S9,S10),
+									%LocalRepository
+									nth0(6,RepoInput,LocalRepository),is_list(LocalRepository),string_concat(S10,"\nCommits en local repository:\n ",S11),
+									local2String(LocalRepository,S11,S12),
+									%Remote Repository
+									nth0(7,RepoInput,RemoteRepository),is_list(RemoteRepository),string_concat(S12,"\nCommits en remote repository:\n ",S13),
+									remote2String(RemoteRepository,S13,S14),
+									string_concat(S14,"\n##### FIN DE REPRESENTACIÓN COMO STRING DEL REPOSITORIO #####\n\n\n\n",RepoAsString),!.
+%Ejemplos de uso
+/*
+Ejemplo 1: 
+
+gitInit("Unity Project","Playdead",R0),
+crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
+git2String(R1,Rstring),write(Rstring).
+
+
+Ejemplo2 :
+
+gitInit("Unity Project","Playdead",R0),
+crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
+gitAdd(R1,[],R2),
+gitCommit(R2,"Character controllers",R3),
+gitPush(R3,R4),
+git2String(R4,Rstring),write(Rstring).
+
+*/
+/*
+	Ejemplo de lo que debería resultar al pasar la variable de salida RepoAsString como entrada al predicado write:
+
+###### Repositorio 'lab3' ######
+	Fecha de creación: 2020/05/20 15:40:10
+	Autor: Juanito Perez
+	rama actual: master
+	Archivos en workspace:
+    a1.txt
+	asd.dat
+	blablabla.jpg
+	Archivos en Index:
+	Commits en local repository:
+	[12AB1EFF] 'mensaje de ejemplo del primer commit'
+	a1.txt
+	[AAA8B1CCF] 'otro mensaje para segundo commit, se agrega archivo asd.dat y blablabla.jpg'
+	asd.dat
+	blablabla.jpg
+	Commits en remote repository:
+	[12AB1EFF] 'mensaje de ejemplo del primer commit'
+	a1.txt
+##### FIN DE REPRESENTACIÓN COMO STRING DEL REPOSITORIO #####
+*/
+
+%----------------------------------------------------------------------------------------------------------------------------------------------	
+
+%gitStatus: Predicado que permite consultar el valor que debe tomar un String partir de una variable de entrada RepoInput, tal que
+%este string contiene la información del ambiente de trabajo de forma legible:
+
+%Archivos agregados al Index
+%Cantidad de commits en el Local Repository
+%La rama actual en la que se encuentra el Local Repository (predeterminado: “master”)
+
+%Debe hacer uso del caracter ‘\n’ para los saltos de línea. No utilice los predicados write y display dentro de este predicado, ya que en
+%la variable de salida RepoStatusStr debe quedar un string el cual pueda luego ser pasado como entrada a los predicados “write” o
+%“display” para poder visualizarlo de forma comprensible al usuario.
+
+
+
+%gitStatus(RepoInput, RepoStatusStr).
+
+
+
+%Ejemplo de uso: gitStatus(RepoInput, RS), write(RS).
+
 
 %----------------------------------------------------------------------------------------------------------------------------------------------
 
-%----------------------------------------------------------------------------------------------------------------------------------------------
+%gitLog: Predicado que permite consultar el valor que debe tomar un String partir de una variable de entrada RepoInput, tal que
+%este string represente de forma legible al usuario la información de los últimos 5 commits sobre el repositorio/rama actual, se debe
+%mostrar al menos el mensaje asociado a cada commit.
+
+%Debe hacer uso del caracter ‘\n’ para los saltos de línea. No utilice los predicados write y display dentro de este predicado, ya que en
+%la variable de salida RepoLogStr debe quedar un string el cual pueda luego ser pasado como entrada a los predicados “write” o “display”
+%para poder visualizarlo de forma comprensible al usuario.
+
+%gitLog(RepoInput, RepoLogStr).
+	
+%Ejemplo de uso: gitLog(RepoInput, RS), write(RS).
+
 
 %----------------------------------------------------------------------------------------------------------------------------------------------
 
-%----------------------------------------------------------------------------------------------------------------------------------------------
+%gitBranch: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
+%que en RepoOutput se contenga una nueva “rama” (flujo alternativo de los commits). De manera predeterminada, la nueva rama toma la
+%historia del último commit. Las ramas deben tener un nombre, donde la rama predeterminada se llama “master”.
+
+%gitBranch(RepoInput, NombreRama, RepoOutput).
+
+
+%Ejemplo de uso: gitBranch(RepoInput, “develop”, RepoOutput).
 
 %----------------------------------------------------------------------------------------------------------------------------------------------
+
+% gitCheckout: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput
+%tal que en RepoOutput la rama actual corresponde a la especificada por la variable NombreRama.
+
+%gitBranch(RepoInput, NombreRama, RepoOutput).
+
+%Ejemplo de uso: gitBranch(RepoInput, “develop”, RepoOutput).
+
+
+%----------------------------------------------------------------------------------------------------------------------------------------------
+
+%Ejemplos
+%A continuación se muestra un ejemplo completo de uso pasando por la gran mayoría de predicados de este laboratorio:
+/*
+gitInit("lab3", "Juanito Perez", R1), 
+gitAdd(R1, ["a1.txt"], R2), 
+gitCommit(R2, "mensaje de ejemplo del primer commit", R3), 
+gitPush(R3, R4),
+git2String(R1, R1Str), write(R1Str),
+git2String(R2, R2Str), write(R2Str),
+git2String(R3, R3Str), write(R3Str),
+git2String(R4, R4Str), write(R4Str),
+gitLog(R2, RlogStr), write(RlogStr),
+gitAdd(R4, [ "asd.dat", "blablabla.jpg" ], R5),
+git2String(R5, R5Str), write(R5Str).
+
+*/
