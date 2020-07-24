@@ -1,0 +1,3 @@
+El repositorio de este laboratorio se encuentra en  :
+
+https://github.com/javierlopez10969/lab2_git_20243378_LopezCampos.git
