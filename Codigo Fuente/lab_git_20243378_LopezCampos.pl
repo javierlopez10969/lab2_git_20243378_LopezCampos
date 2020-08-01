@@ -4,9 +4,21 @@
 %Para ejecutar el programa 
 % [lab_git_20243378_LopezCampos].
 
-%Base de Conocimientos 
+%Dominio:
+% RepoInput  : Variable del tipo Repositorio
+% RepoOutput : Variable del tipo Repositorio
+% Lista : Posible variable del tipo Repositorio
+% Archivo : Variable del tip String
+% [X | Y] = representación de una lista, X cabeza, Y cola
 
-%Reglas y hechos
+
+%Predicados:
+%  crear_archivo(RepoInput,Archivo,RepoOutput).
+%  verificarInput(Lista).
+
+
+
+%Base de Conocimientos 
 
 %TDA Git
 %REPRESENTACIÓN
@@ -43,8 +55,12 @@ blablabla.jpg
 [12AB1EFF] 'mensaje de ejemplo del primer commit'
 a1.txt
 */
- 
+
+ %Reglas y hechos
+
 %Creador de la hora y fecha mediante los functor get_time y convert_time
+%Variable de Entrada
+%Un string de Salida
 getTime(Tiempo):-
 	get_time(T),
 	convert_time(T,Tiempo).
@@ -73,6 +89,7 @@ crear_Commit([X|Y],Mensaje,Commit):-Commit = [Mensaje,[X|Y]|[]].
 
 %Predicados de Pertenencia
 
+%Todos son para comprobar la identidad del repositorio en cada función.
 %Predicado que verifica la aridad correcta del repositorio
 verificarInputCrearArchivo(Lista):- 
 									is_list(Lista),
@@ -166,6 +183,7 @@ elemento_is_inside(["Samuel.txt","Jackson.pdf","KK.krit"],["Samuel.txt","Jackson
 %Modificadores 
 % Operadores de listas 
 
+/*
 %Borrar
 borrar(X,[X|Y],Y).
 borrar(X,[Z|L],[Z|M]):-borrar(X,L,M).
@@ -175,7 +193,7 @@ borrar(X,[Z|L],[Z|M]):-borrar(X,L,M).
 borrarN(0,[_|Y],Y).
 borrarN(N,[Z|L],[Z|M]):- N1 is N-1,borrarN(N1,L,M).
 %L=[a,b,c,d,e,f],borrarN(3,L,F).
-
+*/
 insertarF(X,[],[X|[]]):-!.
 insertarF(X,[Z|[]],[Z|[X|[]]]):-!.
 insertarF(X,[Z|L],[Z|M]):-insertarF(X,L,M).
@@ -210,7 +228,8 @@ longitud([_|Y],N):-longitud(Y,M),N is M+1.
 %gitinit
 %Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un nombre y autor. 
 %RepoOutput tendría un repositorio vacío sin commits y sin archivos en sus zonas.
-%ENTRADAS : gitInit(NombreRepo, Autor, RepoOutput).
+%ENTRADAS : NombreRepo = string Autor = string RepoOutput = Repositorio
+%Salida : Repositorio 
 
 %Ejemplo de uso :  gitInit(“lab3”, “Constanza Zarate”, RepoOutput).
 %Al ser init, es decir el incio de creación no se requiere las ramas
@@ -218,6 +237,8 @@ gitInit(NombreRepo, Autor, RepoOutput):-string(NombreRepo),string(Autor),getTime
 										RepoOutput = [NombreRepo,T,Autor,"master",[],[],[],[]].
 %Ejemplo de uso:
 %gitInit("Mylab","Juanjo",R).
+%gitInit("Unity Prject","PlayDead",Rep).
+%gitInit("libreria.h","Linus",R1).
 
 %----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -228,6 +249,8 @@ gitInit(NombreRepo, Autor, RepoOutput):-string(NombreRepo),string(Autor),getTime
 %debe retornar el resultado, esto aplica para todos los siguientes predicados que usen estas variables.
 %gitAdd(RepoInput, Archivos, RepoOutput).
 
+%Entradas : Repo]input , lista con archivso string
+%SalidaS : RepoOutput
 
 
 %2 casos
@@ -260,11 +283,14 @@ gitAdd(RepoInput, Archivos, RepoOutput):-
 %R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], []], gitAdd(R1,[],RepoOutput).
 %Git add con distintas cantidades de archivos
 %R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], []] , Arch = ["Jackson.pdf"] ,  gitAdd(R1,Arch,RepoOutput).
-%R1 = ["Mylab", "Tue Jul 21 16:56:35 2020", "Juanjo", "master", ["Samuel.txt","Jackson.pdf"], [], [], []] , Arch = ["Samuel.txt","Jackson.pdf"] ,  gitAdd(R1,Arch,RepoOutput).
+%gitInit("PunPun","Inio",R0),crear_archivos(R0,["Volumen01.cbr","Volumen02.cbr","Volumen4.cbr"],R1),gitAdd(R1,[],R2).
+
 %----------------------------------------------------------------------------------------------------------------------------------------------
 %gitCommit: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
 %que en RepoOutput  hay un commit con los cambios almacenados en index y especificando un mensaje descriptivo (un string) para llevarlos al LocalRepository.
-		
+%Entradas : RepoInput, Mensaje = String 
+%Salidas : RepoOutput
+
 gitCommit(RepoInput, Mensaje, RepoOutput):-
 											verificarInputCommit(RepoInput),
 											string(Mensaje),
@@ -311,6 +337,8 @@ recorrerLocal([X|Y],RemoteRepository,RepoInput,RepoOutput):-
 
 %gitPush: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal que en RepoOutput se envían 
 %los commit desde el repositorio local al repositorio remoto registrado en las zonas de trabajo.
+%Entradas : Repositorio de entrada con un commit minimo
+%Salida : Repositorio 
 gitPush(RepoInput, RepoOutput):-
 								verificarInputPush(RepoInput),
 								nth0(6,RepoInput,LocalRepository),
@@ -321,18 +349,28 @@ gitPush(RepoInput, RepoOutput):-
 /*
 Ejemplo de uso
 
+1.-
+
 gitInit("Unity Project","Playdead",R0),
 crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
 gitAdd(R1,[],R2),
 gitCommit(R2,"Character controllers",R3),
 gitPush(R3,Rout).
 
+2.-
+
+3.-
+
+
 */
 %----------------------------------------------------------------------------------------------------------------------------------------------	
 
 %git2String: Predicado que permite consultar el valor que debe tomar un String con una representación como un string posible de
 
-%Predicado que permite concatenar una lista de elementos a un string ya existente
+%Predicado que permite concatenar una lista de elementos a un string ya existente, para eso se crea un predicado para cada zona y tranformarla a string.
+%Entradas : Repositorio
+%Salida : Repositorio transformado a una variable string
+
 
 %Caso borde, lista de elementos vacía
 workspace2String([],StringEntrada,String):-string_concat(StringEntrada,"Workspace Vacío\n",String),!.
@@ -462,6 +500,11 @@ git2String(R6,Rstring),write(Rstring).
 %gitStatus: Predicado que permite consultar el valor que debe tomar un String partir de una variable de entrada RepoInput, tal que
 %este string contiene la información del ambiente de trabajo de forma legible:
 
+%Para este predicado se reutilizan reglas de git2String, pero combinandolas con otras, tales como longitud
+
+%Entradas  Repositorio de entrada
+%Salida :  Una variable tipo string como esta :
+
 %Archivos agregados al Index
 %Cantidad de commits en el Local Repository
 %La rama actual en la que se encuentra el Local Repository (predeterminado: “master”)
@@ -481,6 +524,7 @@ gitStatus(RepoInput, RepoStatusStr):-
 /*
 Ejemplo de uso
 
+1
 gitInit("Unity Project","Playdead",R0),
 crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
 gitAdd(R1,[],R2),
@@ -492,6 +536,15 @@ gitStatus(R6,RF),write(RF),
 gitCommit(R6,"Sprite",R7),
 git2String(R7,Rstring),write(Rstring).
 
+2
+gitInit("Unity Project","Playdead",R0),
+gitStatus(R0,RF),write(RF).
+
+3
+gitInit("Unity Project","Playdead",R0),
+crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
+gitAdd(R1,[],R2),
+gitStatus(R2,RF),write(RF).
 */									.
 
 %----------------------------------------------------------------------------------------------------------------------------------------------
@@ -541,6 +594,7 @@ gitLog(RepoInput, RepoLogStr):-
 /*
 Ejemplo de uso
 
+1
 gitInit("Unity Project","Playdead",R0),
 crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
 gitAdd(R1,[],R2),
@@ -551,6 +605,17 @@ gitAdd(R5,["Sprite.png"],R6),
 gitCommit(R6,"Sprite",R7),
 gitLog(R7,RF),write(RF).
 
+2 Sin commits : 
+
+gitInit("Unity Project","Playdead",R0),
+crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
+gitAdd(R1,[],R2), gitLog(R2,Rs), write(Rs).
+
+3
+gitInit("Unity Project","Playdead",R0),
+crear_archivos(R0,["PlayerController.cs","EnemyPatrol.cs"],R1),
+gitAdd(R1,[],R2),
+gitCommit(R2,"Character controllers",R3),gitLog(R3,Rs),write(Rs).
 */
 
 
@@ -582,16 +647,17 @@ gitLog(R7,RF),write(RF).
 /*
 
 gitInit("lab3", "Juanito Perez", R0),
-crear_archivos(R0,["a.1.txt","asd.dat", "blablabla.jpg"],R1) ,
-gitAdd(R1, ["a1.txt"], R2), 
+crear_archivos(R0,["a1.txt","asd.dat", "blablabla.jpg"],R1),
+gitAdd(R1, ["a1.txt"], R2),
 gitCommit(R2, "mensaje de ejemplo del primer commit", R3), 
 gitPush(R3, R4),
 git2String(R1, R1Str), write(R1Str),
 git2String(R2, R2Str), write(R2Str),
 git2String(R3, R3Str), write(R3Str),
 git2String(R4, R4Str), write(R4Str),
+gitStatus(R4,RF),write(RF),
 gitLog(R2, RlogStr), write(RlogStr),
-gitAdd(R4, [ "asd.dat", "blablabla.jpg" ], R5),
-git2String(R5, R5Str), write(R5Str).
+gitAdd(R4, [ "asd.dat", "blablabla.jpg" ], R5),git2String(R5, R5Str), write(R5Str).
+
 
 */

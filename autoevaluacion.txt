@@ -94,6 +94,8 @@ que en RepoOutput se mueven los cambios (commits) desde RemoteRepository hacia e
 archivos contenidos en estos commits.
 
 	gitPull(RepoInput, RepoOutput).
+
+Puntaje : 0
 	
 (1 pto) gitStatus: Predicado que permite consultar el valor que debe tomar un String partir de una variable de entrada RepoInput, tal que
 este string contiene la información del ambiente de trabajo de forma legible:
@@ -102,39 +104,24 @@ Archivos agregados al Index
 Cantidad de commits en el Local Repository
 La rama actual en la que se encuentra el Local Repository (predeterminado: “master”)
 
-Debe hacer uso del caracter ‘\n’ para los saltos de línea. No utilice los predicados write y display dentro de este predicado, ya que en
-la variable de salida RepoStatusStr debe quedar un string el cual pueda luego ser pasado como entrada a los predicados “write” o
-“display” para poder visualizarlo de forma comprensible al usuario.
-
-	gitStatus(RepoInput, RepoStatusStr).
-
-Ejemplo de uso: gitStatus(RepoInput, RS), write(RS).
+Puntaje : 1
 
 (1 pto) gitLog: Predicado que permite consultar el valor que debe tomar un String partir de una variable de entrada RepoInput, tal que
 este string represente de forma legible al usuario la información de los últimos 5 commits sobre el repositorio/rama actual, se debe
 mostrar al menos el mensaje asociado a cada commit.
 
-Debe hacer uso del caracter ‘\n’ para los saltos de línea. No utilice los predicados write y display dentro de este predicado, ya que en
-la variable de salida RepoLogStr debe quedar un string el cual pueda luego ser pasado como entrada a los predicados “write” o “display”
-para poder visualizarlo de forma comprensible al usuario.
-
-	gitLog(RepoInput, RepoLogStr).
-	
-Ejemplo de uso: gitLog(RepoInput, RS), write(RS).
+Puntaje  : 1
 
 (1 pto) gitBranch: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput tal
 que en RepoOutput se contenga una nueva “rama” (flujo alternativo de los commits). De manera predeterminada, la nueva rama toma la
 historia del último commit. Las ramas deben tener un nombre, donde la rama predeterminada se llama “master”.
 
-	gitBranch(RepoInput, NombreRama, RepoOutput).
-	Ejemplo de uso: gitBranch(RepoInput, “develop”, RepoOutput).
-	
+Puntaje : 0
+
 (0,5 pts) gitCheckout: Predicado que permite consultar el valor que debe tomar RepoOutput a partir de un repositorio de entrada RepoInput
 tal que en RepoOutput la rama actual corresponde a la especificada por la variable NombreRama.
 
-	gitBranch(RepoInput, NombreRama, RepoOutput).
-
-Ejemplo de uso: gitBranch(RepoInput, “develop”, RepoOutput).
+Puntaje : 0
 
 A continuación se muestra un ejemplo completo de uso pasando por la gran mayoría de predicados de este laboratorio:
 
@@ -163,9 +150,11 @@ requerimiento, su proyecto será evaluado con la nota mínima.
 
 (obligatorio) Usar Swi-Prolog versión 8.x.x.
 
-(1.5 pts) Todos los predicados deben estar debidamente comentados. Indicando descripción de la relación, términos de entrada y de salida.
+Todos los predicados deben estar debidamente comentados. Indicando descripción de la relación, términos de entrada y de salida.
 
-(2.5 pts) Historial de trabajo en Github tomando en consideración la evolución en el desarrollo de su proyecto en distintas etapas. Se
+Puntaje : 1 
+
+Historial de trabajo en Github tomando en consideración la evolución en el desarrollo de su proyecto en distintas etapas. Se
 requieren al menos 10 commits distribuidos en un periodo de tiempo mayor o igual a 2 semanas. Los criterios que se consideran en la
 evaluación de este ítem son: fecha primer commit, fecha último commit, total commits y máximo de commits diarios. A modo de ejemplo (y
 solo como una referencia), si hace todos los commits el día antes de la entrega del proyecto, este ítem tendrá 0 pts. De manera similar,
@@ -173,9 +162,11 @@ si hace dos commits dos semanas antes de la entrega final y el resto los concent
 para este ítem (0.375 pts). Por el contrario, si demuestra constancia en los commits (con aportes claros entre uno y otro) a lo largo del
 periodo evaluado, este ítem será evaluado con el total del puntaje.
 
+Puntaje : 1
+
 (obligatorio) Al final de su código incluir al menos 3 ejemplos de uso para cada  uno de los predicados correspondientes a requerimientos
 funcionales obligatorios y extra que realice. Solo se revisarán aquellos predicados para los que existan los ejemplos provistos.
 
-
+Puntaje : 1
 
 
